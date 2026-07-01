@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gesture Blur Cam — Foto Kita Blur Trend</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0A10;
+    --surface:#15131C;
+    --surface-2:#1D1A26;
+    --line:#2B2733;
+    --accent-pink:#FF3E9A;
+    --accent-violet:#7C5CFF;
+    --text:#F3F0FA;
+    --muted:#8A8594;
+    --success:#33E6A0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(124,92,255,0.18), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(255,62,154,0.14), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100vh;
+    padding:32px 20px 60px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent-pink);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent-pink);box-shadow:0 0 10px var(--accent-pink);}
+
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:clamp(28px,4.5vw,42px);
+    line-height:1.05;
+    margin:10px 0 8px;
+    letter-spacing:-0.01em;
+  }
+  h1 span{color:var(--accent-violet);}
+  .sub{color:var(--muted);font-size:15px;line-height:1.6;max-width:640px;margin:0 0 28px;}
+  .sub b{color:var(--text);font-weight:600;}
+
+  .grid{display:grid;grid-template-columns:1.15fr 1fr;gap:20px;}
+  @media(max-width:760px){.grid{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:18px;
+  }
+  .card h2{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    margin:0 0 14px;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+
+  /* ---- viewfinder ---- */
+  .viewfinder{
+    position:relative;
+    aspect-ratio:4/5;
+    border-radius:14px;
+    overflow:hidden;
+    background:#000;
+    border:1px solid var(--line);
+  }
+  video,canvas{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    object-fit:cover;
+    transform:scaleX(-1);
+  }
+  video{visibility:hidden;}
+  .bracket{
+    position:absolute;width:26px;height:26px;
+    border:2px solid rgba(255,62,154,0.85);
+    z-index:3;pointer-events:none;
+    filter:drop-shadow(0 0 6px rgba(255,62,154,0.5));
+  }
+  .bracket.tl{top:14px;left:14px;border-right:none;border-bottom:none;border-radius:8px 0 0 0;}
+  .bracket.tr{top:14px;right:14px;border-left:none;border-bottom:none;border-radius:0 8px 0 0;}
+  .bracket.bl{bottom:14px;left:14px;border-right:none;border-top:none;border-radius:0 0 0 8px;}
+  .bracket.br{bottom:14px;right:14px;border-left:none;border-top:none;border-radius:0 0 8px 0;}
+
+  .vf-status{
+    position:absolute;top:14px;left:50%;transform:translateX(-50%);
+    z-index:4;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    padding:6px 14px;
+    border-radius:999px;
+    background:rgba(11,10,16,0.6);
+    backdrop-filter:blur(8px);
+    border:1px solid var(--line);
+    color:var(--muted);
+    transition:all .2s ease;
+    white-space:nowrap;
+  }
+  .vf-status.active{color:var(--bg);background:var(--accent-pink);border-color:var(--accent-pink);}
+
+  .rec-dot{
+    position:absolute;top:14px;right:14px;z-index:4;
+    display:none;align-items:center;gap:6px;
+    font-family:'JetBrains Mono',monospace;font-size:12px;
+    background:rgba(11,10,16,0.6);backdrop-filter:blur(8px);
+    padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+  }
+  .rec-dot.show{display:flex;}
+  .rec-dot i{width:8px;height:8px;border-radius:50%;background:#ff4444;animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  .vf-hint{
+    position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+    z-index:4;font-size:11px;color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    background:rgba(11,10,16,0.5);padding:4px 10px;border-radius:999px;
+  }
+
+  /* ---- controls ---- */
+  .field{margin-bottom:16px;}
+  .field label{
+    display:block;font-size:12px;color:var(--muted);
+    margin-bottom:6px;font-weight:500;
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  input[type="file"]{
+    width:100%;font-size:13px;color:var(--muted);
+    background:var(--surface-2);border:1px solid var(--line);
+    border-radius:10px;padding:10px;
+  }
+  input[type="number"], input[type="text"]{
+    width:100%;background:var(--surface-2);border:1px solid var(--line);
+    color:var(--text);border-radius:10px;padding:10px 12px;
+    font-family:'JetBrains Mono',monospace;font-size:14px;
+  }
+  input[type="number"]:focus, input[type="text"]:focus{outline:2px solid var(--accent-violet);outline-offset:1px;}
+
+  .audio-preview{width:100%;margin-top:8px;height:34px;}
+  .use-here{
+    margin-top:8px;font-size:12px;color:var(--accent-violet);
+    background:none;border:1px solid var(--accent-violet);
+    padding:6px 10px;border-radius:8px;cursor:pointer;font-family:'JetBrains Mono',monospace;
+  }
+  .use-here:hover{background:rgba(124,92,255,0.12);}
+
+  .locked-audio-box{
+    background:var(--surface-2);border:1px solid var(--line);
+    border-radius:12px;padding:14px;margin-bottom:16px;
+  }
+  .locked-audio-label{
+    font-family:'JetBrains Mono',monospace;font-size:11px;
+    text-transform:uppercase;letter-spacing:.08em;color:var(--accent-violet);margin-bottom:6px;
+  }
+  .locked-audio-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;margin-bottom:4px;}
+  .locked-audio-timing{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+  .locked-audio-timing b{color:var(--text);}
+
+  .audio-download-btn{
+    display:block;margin-top:10px;text-align:center;
+    background:linear-gradient(135deg,var(--accent-pink),var(--accent-violet));
+    color:#fff;text-decoration:none;font-weight:600;padding:12px;
+    border-radius:10px;font-size:13px;font-family:'Space Grotesk',sans-serif;
+  }
+
+  .btn-row{display:flex;gap:10px;margin-top:20px;}
+  button.primary, button.stop{
+    flex:1;border:none;border-radius:12px;padding:14px 16px;
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;
+    cursor:pointer;transition:transform .1s ease, opacity .2s ease;
+  }
+  button.primary{background:linear-gradient(135deg,var(--accent-pink),var(--accent-violet));color:#fff;}
+  button.stop{background:var(--surface-2);color:var(--text);border:1px solid var(--line);display:none;}
+  button.stop.show{display:block;}
+  button:disabled{opacity:.4;cursor:not-allowed;}
+  button.primary:active, button.stop:active{transform:scale(0.98);}
+
+  .status-line{
+    margin-top:12px;font-size:13px;color:var(--muted);
+    min-height:18px;font-family:'JetBrains Mono',monospace;
+  }
+
+  .output{margin-top:16px;}
+  .output video{position:static;transform:none;width:100%;border-radius:12px;display:none;}
+  .output a{
+    display:none;margin-top:10px;text-align:center;
+    background:var(--success);color:#0B0A10;text-decoration:none;
+    font-weight:600;padding:10px;border-radius:10px;font-size:13px;
+    font-family:'Space Grotesk',sans-serif;
+  }
+
+  footer{
+    margin-top:28px;font-size:12px;color:var(--muted);
+    line-height:1.7;border-top:1px solid var(--line);padding-top:18px;
+  }
+  footer b{color:var(--text);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Trend Replika — TikTok</div>
+  <h1>Foto Kita <span>Blur</span> Gesture Cam</h1>
+  <p class="sub">
+    Angkat kedua tangan membentuk isyarat <b>angka 2</b> (jari telunjuk + tengah) di kanan dan kiri sekaligus untuk
+    memicu efek blur kamera secara live — terinspirasi tren yang memakai lagu <b>"Foto Kita Blur"</b> dari Sal Priadi.
+    Atur kapan audio kamu mulai diputar, lalu tekan Record.
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>📷 Viewfinder</h2>
+      <div class="viewfinder" id="viewfinder">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="canvas"></canvas>
+        <div class="bracket tl"></div>
+        <div class="bracket tr"></div>
+        <div class="bracket bl"></div>
+        <div class="bracket br"></div>
+        <div class="vf-status" id="vfStatus">Menunggu kamera…</div>
+        <div class="rec-dot" id="recDot"><i></i>REC <span id="recTime">0:00</span></div>
+        <div class="vf-hint">✌️ Bentuk angka 2 di dua tangan untuk blur</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎵 Audio & Record</h2>
+
+      <div class="locked-audio-box">
+        <div class="locked-audio-label">Audio trek terkunci</div>
+        <div class="locked-audio-name" id="lockedTrackName">Memuat…</div>
+        <div class="locked-audio-timing">Diputar otomatis dari <b id="lockLabelStart">0:00</b> sampai <b id="lockLabelEnd">0:00</b></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="primary" id="recordBtn">● Mulai Record</button>
+        <button class="stop" id="stopBtn">■ Stop</button>
+      </div>
+      <div class="status-line" id="statusLine">Izinkan akses kamera & mikrofon untuk mulai.</div>
+
+      <div class="output">
+        <video id="outputVideo" controls></video>
+        <a id="downloadLink" download="gesture-blur-video.webm">⬇ Download Video Hasil Record</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <b>Catatan penting (untuk kamu, pemilik halaman):</b><br>
+    1. Buat folder bernama <code>audio</code> tepat di sebelah file HTML ini.<br>
+    2. Taruh file audio kamu di dalamnya dengan nama persis <code>track.mp3</code> — pastikan itu audio yang memang legal untuk kamu bagikan (rekaman sendiri, lisensi resmi, atau royalty-free).<br>
+    3. Timing sudah dikunci di kode ke <b>38.5 detik – 53 detik</b> dan tidak muncul sebagai kolom yang bisa diedit di tampilan pengunjung. Kalau mau ubah, cari <code>LOCKED_START</code> / <code>LOCKED_END</code> di bagian &lt;script&gt;.<br>
+    3b. Audio tidak disediakan sebagai file terpisah untuk diunduh — begitu tombol <b>Record</b> ditekan, audio otomatis diputar dari detik 38.5 dan langsung ikut terekam menyatu ke dalam video hasil (bukan file terpisah).<br>
+    4. Struktur folder saat upload ke hosting (GitHub Pages / Netlify / dsb):<br>
+    <code>&nbsp;&nbsp;index.html (file ini)<br>&nbsp;&nbsp;audio/track.mp3</code><br><br>
+    Deteksi tangan berjalan sepenuhnya di browser pengunjung (tidak diunggah ke server manapun). Butuh koneksi internet untuk memuat
+    library deteksi tangan (MediaPipe) saat pertama kali dibuka, dan buka file ini lewat server (bukan langsung dobel-klik)
+    supaya kamera dan file audio lokal bisa diakses dengan benar.
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const vfStatus = document.getElementById('vfStatus');
+const recDot = document.getElementById('recDot');
+const recTimeEl = document.getElementById('recTime');
+const statusLine = document.getElementById('statusLine');
+
+const recordBtn = document.getElementById('recordBtn');
+const stopBtn = document.getElementById('stopBtn');
+const outputVideo = document.getElementById('outputVideo');
+const downloadLink = document.getElementById('downloadLink');
+const lockedTrackName = document.getElementById('lockedTrackName');
+const lockLabelStart = document.getElementById('lockLabelStart');
+const lockLabelEnd = document.getElementById('lockLabelEnd');
+
+// ====== TIMING TERKUNCI (tidak dapat diubah dari tampilan) ======
+const LOCKED_AUDIO_SRC = 'audio/Foto-kita-blur.mp3'; // ganti file di folder audio/ dengan lagu milikmu
+const LOCKED_START = 38.5;
+const LOCKED_END = 53;
+// ==================================================================
+
+function fmtTime(s){
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+}
+lockLabelStart.textContent = fmtTime(LOCKED_START);
+lockLabelEnd.textContent = fmtTime(LOCKED_END);
+lockedTrackName.textContent = LOCKED_AUDIO_SRC.split('audio/Foto-kita-blur.mp3').pop();
+
+const audioPreview = new Audio(LOCKED_AUDIO_SRC);
+audioPreview.preload = 'auto';
+let audioLoaded = true;
+let audioReadyAtLockedStart = false;
+let audioCtx, mediaElSource, mixDest;
+
+function prepareAudioGraph(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    mediaElSource = audioCtx.createMediaElementSource(audioPreview);
+    mixDest = audioCtx.createMediaStreamDestination();
+    mediaElSource.connect(audioCtx.destination);
+    mediaElSource.connect(mixDest);
+  }
+}
+try{
+  prepareAudioGraph();
+}catch(e){
+  console.error('Audio graph gagal disiapkan saat load:', e);
+}
+
+// Pre-seek ke posisi terkunci lebih awal supaya saat tombol Record ditekan,
+// audio tidak perlu decode/seek dulu (menghindari delay/lag saat mulai).
+audioPreview.addEventListener('loadedmetadata', ()=>{
+  audioPreview.currentTime = LOCKED_START;
+});
+audioPreview.addEventListener('seeked', ()=>{
+  audioReadyAtLockedStart = true;
+}, {once:true});
+
+let currentBlur = 0;
+let targetBlur = 0;
+const MAX_BLUR = 22;
+
+let mediaRecorder, chunks = [];
+let recordStartAt = 0;
+let recTimerInterval = null;
+let autoStopTimeout = null;
+let camReady = false;
+
+// ---------- kamera ----------
+async function startCamera(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({video:{width:640,height:800},audio:false});
+    video.srcObject = stream;
+    await video.play();
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 800;
+    camReady = true;
+    vfStatus.textContent = '0/2 tangan terdeteksi';
+    statusLine.textContent = 'Kamera siap. Tekan Record untuk mulai.';
+  }catch(err){
+    vfStatus.textContent = 'Kamera tidak dapat diakses';
+    statusLine.textContent = 'Izin kamera ditolak / tidak tersedia: ' + err.message;
+  }
+}
+
+// Panggil kamera SEGERA dan terpisah dari setup lain, supaya permintaan izin
+// kamera tetap muncul walau library deteksi gestur (MediaPipe) gagal dimuat.
+startCamera().then(()=>{
+  renderLoop();
+});
+
+// ---------- deteksi gestur ----------
+function dist(a,b){
+  return Math.hypot(a.x-b.x, a.y-b.y, (a.z||0)-(b.z||0));
+}
+function isFingerExtended(lm, tipIdx, pipIdx){
+  const wrist = lm[0];
+  return dist(wrist, lm[tipIdx]) > dist(wrist, lm[pipIdx]) * 1.15;
+}
+function isTwoGesture(lm){
+  const index = isFingerExtended(lm, 8, 6);
+  const middle = isFingerExtended(lm, 12, 10);
+  const ring = !isFingerExtended(lm, 16, 14);
+  const pinky = !isFingerExtended(lm, 20, 18);
+  return index && middle && ring && pinky;
+}
+
+let handsCount = 0;
+let handsReady = false;
+
+try{
+  if(typeof Hands === 'undefined'){
+    throw new Error('Library MediaPipe Hands gagal dimuat (cek koneksi internet / pemblokir script).');
+  }
+  const hands = new Hands({locateFile:(f)=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+  hands.setOptions({maxNumHands:2, modelComplexity:1, minDetectionConfidence:0.7, minTrackingConfidence:0.6});
+  hands.onResults((results)=>{
+    const lms = results.multiHandLandmarks || [];
+    handsCount = lms.length;
+    let bothTwo = false;
+    if(lms.length === 2){
+      bothTwo = lms.every(isTwoGesture);
+    }
+    targetBlur = bothTwo ? MAX_BLUR : 0;
+
+    if(camReady){
+      if(bothTwo){
+        vfStatus.textContent = '✌️✌️ BLUR AKTIF';
+        vfStatus.classList.add('active');
+      } else {
+        vfStatus.textContent = `${lms.length}/2 tangan terdeteksi`;
+        vfStatus.classList.remove('active');
+      }
+    }
+  });
+
+  async function detectLoop(){
+    if(camReady && video.readyState >= 2){
+      await hands.send({image: video});
+    }
+    requestAnimationFrame(detectLoop);
+  }
+  handsReady = true;
+  detectLoop();
+}catch(err){
+  console.error('Gesture detection tidak aktif:', err);
+  statusLine.textContent = 'Deteksi gestur tidak tersedia (' + err.message + '). Kamera tetap berfungsi untuk record.';
+}
+
+function renderLoop(){
+  currentBlur += (targetBlur - currentBlur) * 0.15;
+  if(canvas.width && video.readyState >= 2){
+    ctx.filter = `blur(${currentBlur.toFixed(1)}px) saturate(${1 + currentBlur*0.01})`;
+    ctx.save();
+    ctx.translate(canvas.width,0);
+    ctx.scale(-1,1);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
+  requestAnimationFrame(renderLoop);
+}
+
+// canvas is drawn already mirrored internally, so undo CSS mirror for canvas element
+canvas.style.transform = 'none';
+
+// ---------- recording ----------
+recordBtn.addEventListener('click', async ()=>{
+  if(!camReady){ statusLine.textContent = 'Kamera belum siap.'; return; }
+  recordBtn.disabled = true;
+
+  const canvasStream = canvas.captureStream(30);
+  let tracks = [...canvasStream.getVideoTracks()];
+
+  if(audioLoaded){
+    try{
+      prepareAudioGraph();
+      if(audioCtx.state === 'suspended') await audioCtx.resume();
+      tracks = tracks.concat(mixDest.stream.getAudioTracks());
+      // Pastikan posisi tepat di titik terkunci sesaat sebelum mulai
+      // (biasanya sudah di posisi ini berkat pre-seek saat load, jadi ini instan).
+      if(Math.abs(audioPreview.currentTime - LOCKED_START) > 0.05){
+        audioPreview.currentTime = LOCKED_START;
+      }
+    }catch(e){
+      statusLine.textContent = 'Gagal menyiapkan audio: ' + e.message;
+    }
+  }
+
+  const mixedStream = new MediaStream(tracks);
+  let mimeType = 'video/webm;codecs=vp9,opus';
+  if(!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm';
+  chunks = [];
+  mediaRecorder = new MediaRecorder(mixedStream, {mimeType});
+  mediaRecorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(chunks, {type:'video/webm'});
+    const url = URL.createObjectURL(blob);
+    outputVideo.src = url;
+    outputVideo.style.display = 'block';
+    downloadLink.href = url;
+    downloadLink.style.display = 'block';
+    statusLine.textContent = 'Selesai. Video siap diputar / diunduh.';
+    clearInterval(recTimerInterval);
+    recDot.classList.remove('show');
+    recordBtn.disabled = false;
+    stopBtn.classList.remove('show');
+    if(audioLoaded) audioPreview.pause();
+  };
+
+  // Mulai recorder DAN audio pada saat yang sama (back-to-back, tanpa await
+  // salah satu dulu) supaya tidak ada jeda antara suara yang keluar di speaker
+  // dan suara yang mulai terekam ke dalam video.
+  mediaRecorder.start();
+  if(audioLoaded) audioPreview.play().catch(e=>{ statusLine.textContent = 'Gagal memutar audio: ' + e.message; });
+
+  recordStartAt = Date.now();
+  recDot.classList.add('show');
+  stopBtn.classList.add('show');
+  statusLine.textContent = 'Merekam…';
+  recTimerInterval = setInterval(()=>{
+    recTimeEl.textContent = fmtTime((Date.now()-recordStartAt)/1000);
+  }, 250);
+
+  if(LOCKED_END > LOCKED_START){
+    autoStopTimeout = setTimeout(()=>{ stopRecording(); }, (LOCKED_END-LOCKED_START)*1000);
+  }
+});
+
+stopBtn.addEventListener('click', stopRecording);
+
+function stopRecording(){
+  if(autoStopTimeout) clearTimeout(autoStopTimeout);
+  if(mediaRecorder && mediaRecorder.state !== 'inactive'){
+    mediaRecorder.stop();
+  }
+}
+
+// ---------- init ----------
+// (label timing & nama trek sudah di-set di awal script sebelum kamera dipanggil)
+
+</script>
+</body>
+</html>
