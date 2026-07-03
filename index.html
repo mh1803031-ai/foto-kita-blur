@@ -352,6 +352,49 @@
   }
   footer details[open] summary::before{transform:rotate(90deg);}
   footer .footer-body{margin-top:14px;}
+  .steps-list{
+    margin:0;padding-left:0;list-style:none;counter-reset:step;
+  }
+  .steps-list li{
+    counter-increment:step;
+    position:relative;
+    padding-left:28px;
+    margin-bottom:12px;
+    line-height:1.6;
+    color:var(--muted);
+  }
+  .steps-list li:last-child{margin-bottom:0;}
+  .steps-list li::before{
+    content:counter(step);
+    position:absolute;left:0;top:0;
+    width:19px;height:19px;
+    border-radius:50%;
+    background:var(--panel-2);
+    border:1px solid var(--amber);
+    color:var(--amber);
+    font-size:10px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .steps-list li b{color:var(--paper);}
+
+  .social-row{
+    display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;
+  }
+  .social-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:9px 16px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    color:var(--paper);
+    text-decoration:none;
+    font-family:'Instrument Sans',sans-serif;
+    font-size:12.5px;font-weight:600;
+    transition:border-color .2s ease, transform .15s ease, color .2s ease;
+  }
+  .social-btn svg{flex-shrink:0;}
+  .social-btn:hover{border-color:var(--safelight);color:var(--amber);transform:translateY(-1px);}
+  .social-btn:active{transform:scale(0.97);}
   footer .footer-title{
     font-family:'Instrument Sans',sans-serif;font-weight:700;color:var(--paper);
     font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;
@@ -441,20 +484,28 @@
   </div>
 
   <footer>
-    <details>
-      <summary class="footer-title">Catatan Teknis — Pemilik Halaman</summary>
+    <details open>
+      <summary class="footer-title">Cara Menggunakan</summary>
       <div class="footer-body">
-        1. Buat folder <code>audio</code> tepat di sebelah file HTML ini.<br>
-        2. Taruh file audio kamu di dalamnya dengan nama persis <code>track.mp3</code> — pastikan itu audio yang memang legal untuk kamu bagikan (rekaman sendiri, lisensi resmi, atau royalty-free).<br>
-        3. Timing sudah dikunci di kode ke <b style="color:var(--amber)">38.5 detik – 53 detik</b> dan tidak muncul sebagai kolom yang bisa diedit di tampilan pengunjung. Untuk ubah, cari <code>LOCKED_START</code> / <code>LOCKED_END</code> di bagian &lt;script&gt;.<br>
-        4. Audio tidak disediakan sebagai file terpisah untuk diunduh — begitu tombol shutter ditekan, audio otomatis diputar dan langsung ikut terekam menyatu ke dalam video hasil.<br>
-        5. Struktur folder saat upload ke hosting (Vercel / Netlify / GitHub Pages):<br>
-        <code>&nbsp;&nbsp;index.html</code><br><code>&nbsp;&nbsp;audio/track.mp3</code><br><br>
-        Deteksi tangan berjalan sepenuhnya di browser pengunjung (tidak diunggah ke server manapun). Butuh koneksi internet untuk memuat
-        library deteksi tangan (MediaPipe) saat pertama kali dibuka, dan buka file ini lewat server (bukan langsung dobel-klik)
-        supaya kamera dan file audio lokal bisa diakses dengan benar.
+        <ol class="steps-list">
+          <li>Aktifkan izin untuk mengakses kamera pada browser yang digunakan.</li>
+          <li>Lakukan postur tangan angka 2 pada kedua tangan untuk memastikan efek blur aktif.</li>
+          <li>Klik <b>Record</b> jika ingin memulai tren tersebut.</li>
+          <li>Download hasil record tersebut untuk memastikan hasilnya.</li>
+        </ol>
       </div>
     </details>
+
+    <div class="social-row">
+      <a class="social-btn" href="https://www.instagram.com/m_hbib03" target="_blank" rel="noopener noreferrer" aria-label="Kunjungi Instagram">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>
+        Instagram
+      </a>
+      <a class="social-btn" href="https://github.com/mh1803031-ai" target="_blank" rel="noopener noreferrer" aria-label="Kunjungi GitHub">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.11.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.55-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.3 3.5 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.3-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .3Z"/></svg>
+        GitHub
+      </a>
+    </div>
   </footer>
 </div>
 
