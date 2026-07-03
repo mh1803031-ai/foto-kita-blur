@@ -2,90 +2,193 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#17120F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
 <title>Gesture Blur Cam — Foto Kita Blur Trend</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2317120F'/%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='%23E7AE49' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23E2562B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0B0A10;
-    --surface:#15131C;
-    --surface-2:#1D1A26;
-    --line:#2B2733;
-    --accent-pink:#FF3E9A;
-    --accent-violet:#7C5CFF;
-    --text:#F3F0FA;
-    --muted:#8A8594;
-    --success:#33E6A0;
+    --void:#17120F;
+    --panel:#221B15;
+    --panel-2:#2B221A;
+    --line:#3B2F23;
+    --safelight:#E2562B;
+    --amber:#E7AE49;
+    --paper:#F2E8D6;
+    --muted:#A0907A;
+    --sage:#8CA084;
   }
-  *{box-sizing:border-box;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{overflow-x:hidden;}
   html,body{margin:0;padding:0;}
-  body{
-    background:
-      radial-gradient(1200px 600px at 15% -10%, rgba(124,92,255,0.18), transparent 60%),
-      radial-gradient(900px 500px at 100% 0%, rgba(255,62,154,0.14), transparent 55%),
-      var(--bg);
-    color:var(--text);
-    font-family:'Inter',system-ui,sans-serif;
-    min-height:100vh;
-    padding:32px 20px 60px;
-  }
-  .wrap{max-width:920px;margin:0 auto;}
 
-  .eyebrow{
-    font-family:'JetBrains Mono',monospace;
-    font-size:12px;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color:var(--accent-pink);
-    display:flex;
-    align-items:center;
-    gap:8px;
+  body{
+    position:relative;
+    background:var(--void);
+    color:var(--paper);
+    font-family:'Instrument Sans',system-ui,sans-serif;
+    min-height:100vh;
+    min-height:100dvh;
+    overflow-x:hidden;
+    padding:clamp(22px,5vw,40px) clamp(16px,4vw,22px) calc(clamp(20px,5vw,60px) + env(safe-area-inset-bottom));
+    -webkit-font-smoothing:antialiased;
+    isolation:isolate;
   }
-  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent-pink);box-shadow:0 0 10px var(--accent-pink);}
+
+  /* warm light-leak bloom, single deliberate streak (not a generic blob gradient) */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    z-index:-2;
+    background:
+      radial-gradient(60% 45% at 88% -8%, rgba(226,86,43,0.30), transparent 60%),
+      radial-gradient(40% 30% at 8% 108%, rgba(140,160,132,0.14), transparent 65%),
+      var(--void);
+    pointer-events:none;
+  }
+  /* fine film grain, subtle, breaks up flat gradients */
+  body::after{
+    content:"";
+    position:fixed;inset:0;
+    z-index:-1;
+    opacity:0.05;
+    mix-blend-mode:overlay;
+    pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  ::selection{background:var(--safelight);color:var(--paper);}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-track{background:var(--void);}
+  ::-webkit-scrollbar-thumb{background:var(--panel-2);border-radius:6px;border:2px solid var(--void);}
+  ::-webkit-scrollbar-thumb:hover{background:var(--line);}
+
+  .wrap{max-width:940px;margin:0 auto;position:relative;}
+
+  @keyframes riseIn{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .masthead, h1, .sub, .grid, footer{
+    animation:riseIn .55s cubic-bezier(.16,.8,.3,1) both;
+  }
+  .masthead{animation-delay:0s;}
+  h1{animation-delay:.06s;}
+  .sub{animation-delay:.12s;}
+  .grid{animation-delay:.18s;}
+  footer{animation-delay:.28s;}
+  @media (prefers-reduced-motion: reduce){
+    .masthead,h1,.sub,.grid,footer{animation:none;}
+  }
+
+  button{touch-action:manipulation;-webkit-user-select:none;user-select:none;font-family:inherit;}
+  :focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  /* ---- masthead: film-canister label badge ---- */
+  .masthead{display:flex;align-items:center;gap:10px;}
+  .mark{flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(226,86,43,0.35));}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;font-weight:600;
+    letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--void);
+    background:var(--amber);
+    padding:5px 10px 5px 8px;
+    border-radius:3px;
+  }
+  .eyebrow::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--safelight);flex-shrink:0;}
 
   h1{
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:700;
-    font-size:clamp(28px,4.5vw,42px);
-    line-height:1.05;
-    margin:10px 0 8px;
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-optical-sizing:auto;
+    font-size:clamp(30px,7vw,50px);
+    line-height:1.02;
+    margin:16px 0 10px;
     letter-spacing:-0.01em;
+    color:var(--paper);
   }
-  h1 span{color:var(--accent-violet);}
-  .sub{color:var(--muted);font-size:15px;line-height:1.6;max-width:640px;margin:0 0 28px;}
-  .sub b{color:var(--text);font-weight:600;}
+  h1 em{
+    font-style:italic;
+    font-weight:500;
+    color:var(--safelight);
+  }
+  .sub{
+    color:var(--muted);font-size:clamp(13.5px,3.6vw,15.5px);line-height:1.65;
+    max-width:600px;margin:0 0 30px;
+  }
+  .sub b{color:var(--paper);font-weight:600;}
 
-  .grid{display:grid;grid-template-columns:1.15fr 1fr;gap:20px;}
-  @media(max-width:760px){.grid{grid-template-columns:1fr;}}
+  .grid{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;}
+  @media(max-width:760px){.grid{grid-template-columns:1fr;gap:14px;}}
 
   .card{
-    background:var(--surface);
+    position:relative;
+    background:var(--panel);
     border:1px solid var(--line);
-    border-radius:18px;
-    padding:18px;
+    border-radius:4px;
+    padding:clamp(16px,4vw,22px);
+    transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
   }
+  @media (hover:hover){
+    .card:hover{
+      transform:translateY(-3px);
+      border-color:rgba(231,174,73,0.4);
+      box-shadow:0 18px 40px -22px rgba(0,0,0,0.6);
+    }
+  }
+  /* aperture-ring corner ticks, quiet signature detail reused across cards */
+  .card::before, .card::after{
+    content:"";position:absolute;width:12px;height:12px;
+    border:1.5px solid var(--amber);opacity:0.55;
+  }
+  .card::before{top:-1px;left:-1px;border-right:none;border-bottom:none;}
+  .card::after{bottom:-1px;right:-1px;border-left:none;border-top:none;}
+
   .card h2{
-    font-family:'Space Grotesk',sans-serif;
-    font-size:14px;
-    text-transform:uppercase;
-    letter-spacing:0.08em;
-    margin:0 0 14px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.1em;
+    margin:0 0 4px;
     color:var(--muted);
-    display:flex;
-    align-items:center;
-    gap:8px;
+    display:flex;align-items:baseline;gap:9px;
+  }
+  .card h2 .num{color:var(--safelight);font-size:11px;}
+  .card .step-caption{
+    font-size:12.5px;color:var(--muted);margin:0 0 16px;
+    font-family:'Instrument Sans',sans-serif;
   }
 
   /* ---- viewfinder ---- */
   .viewfinder{
     position:relative;
     aspect-ratio:4/5;
-    border-radius:14px;
+    max-height:70vh;max-height:70dvh;
+    border-radius:2px;
     overflow:hidden;
-    background:#000;
+    background:
+      repeating-linear-gradient(115deg, rgba(231,174,73,0.05) 0px, rgba(231,174,73,0.05) 1px, transparent 1px, transparent 26px),
+      #050403;
+    background-size:200% 200%;
+    animation:scan 7s linear infinite;
     border:1px solid var(--line);
+    margin:0 auto;
   }
+  @keyframes scan{
+    0%{background-position:0% 0%;}
+    100%{background-position:120% 40%;}
+  }
+  @media (prefers-reduced-motion: reduce){ .viewfinder{animation:none;} }
+  @media(max-width:480px){ .viewfinder{aspect-ratio:3/4;max-height:60dvh;} }
+
   video,canvas{
     position:absolute;inset:0;
     width:100%;height:100%;
@@ -93,169 +196,240 @@
     transform:scaleX(-1);
   }
   video{visibility:hidden;}
-  .bracket{
-    position:absolute;width:26px;height:26px;
-    border:2px solid rgba(255,62,154,0.85);
-    z-index:3;pointer-events:none;
-    filter:drop-shadow(0 0 6px rgba(255,62,154,0.5));
+
+  /* subtle vignette so the frame reads as an optical viewfinder, not a webcam preview */
+  .viewfinder .vignette{
+    position:absolute;inset:0;z-index:2;pointer-events:none;
+    box-shadow:inset 0 0 90px 18px rgba(0,0,0,0.55);
   }
-  .bracket.tl{top:14px;left:14px;border-right:none;border-bottom:none;border-radius:8px 0 0 0;}
-  .bracket.tr{top:14px;right:14px;border-left:none;border-bottom:none;border-radius:0 8px 0 0;}
-  .bracket.bl{bottom:14px;left:14px;border-right:none;border-top:none;border-radius:0 0 0 8px;}
-  .bracket.br{bottom:14px;right:14px;border-left:none;border-top:none;border-radius:0 0 8px 0;}
+
+  .bracket{
+    position:absolute;width:22px;height:22px;
+    border:1.5px solid rgba(231,174,73,0.8);
+    z-index:3;pointer-events:none;
+  }
+  .bracket.tl{top:12px;left:12px;border-right:none;border-bottom:none;}
+  .bracket.tr{top:12px;right:12px;border-left:none;border-bottom:none;}
+  .bracket.bl{bottom:12px;left:12px;border-right:none;border-top:none;}
+  .bracket.br{bottom:12px;right:12px;border-left:none;border-top:none;}
+
+  /* decorative exif-style readouts, camera-metaphor flavor, purely cosmetic */
+  .exif-tag{
+    position:absolute;z-index:4;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.04em;
+    color:rgba(242,232,214,0.55);
+    text-shadow:0 1px 2px rgba(0,0,0,0.6);
+  }
+  .exif-tag.tl{top:14px;left:40px;}
+  .exif-tag.tr{top:14px;right:40px;}
 
   .vf-status{
     position:absolute;top:14px;left:50%;transform:translateX(-50%);
     z-index:4;
-    font-family:'JetBrains Mono',monospace;
-    font-size:12px;
-    padding:6px 14px;
-    border-radius:999px;
-    background:rgba(11,10,16,0.6);
-    backdrop-filter:blur(8px);
-    border:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:clamp(10px,3vw,11.5px);
+    font-weight:500;
+    padding:6px 13px;
+    border-radius:2px;
+    background:rgba(5,4,3,0.7);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    border:1px solid rgba(231,174,73,0.35);
     color:var(--muted);
     transition:all .2s ease;
     white-space:nowrap;
+    max-width:calc(100% - 90px);
+    overflow:hidden;text-overflow:ellipsis;
   }
-  .vf-status.active{color:var(--bg);background:var(--accent-pink);border-color:var(--accent-pink);}
+  .vf-status.active{color:var(--void);background:var(--safelight);border-color:var(--safelight);font-weight:600;}
 
   .rec-dot{
-    position:absolute;top:14px;right:14px;z-index:4;
+    position:absolute;bottom:14px;right:12px;z-index:4;
     display:none;align-items:center;gap:6px;
-    font-family:'JetBrains Mono',monospace;font-size:12px;
-    background:rgba(11,10,16,0.6);backdrop-filter:blur(8px);
-    padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
+    background:rgba(5,4,3,0.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    padding:6px 10px;border-radius:2px;border:1px solid rgba(226,86,43,0.5);
+    color:var(--paper);
   }
   .rec-dot.show{display:flex;}
-  .rec-dot i{width:8px;height:8px;border-radius:50%;background:#ff4444;animation:pulse 1s infinite;}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .rec-dot i{width:7px;height:7px;border-radius:50%;background:var(--safelight);animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
 
   .vf-hint{
-    position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
-    z-index:4;font-size:11px;color:var(--muted);
-    font-family:'JetBrains Mono',monospace;
-    background:rgba(11,10,16,0.5);padding:4px 10px;border-radius:999px;
+    position:absolute;bottom:14px;left:12px;
+    z-index:4;font-size:10.5px;color:rgba(242,232,214,0.65);
+    font-family:'IBM Plex Mono',monospace;
+    background:rgba(5,4,3,0.55);padding:5px 9px;border-radius:2px;
+    max-width:calc(100% - 100px);
   }
 
-  /* ---- controls ---- */
-  .field{margin-bottom:16px;}
-  .field label{
-    display:block;font-size:12px;color:var(--muted);
-    margin-bottom:6px;font-weight:500;
-  }
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-
-  input[type="file"]{
-    width:100%;font-size:13px;color:var(--muted);
-    background:var(--surface-2);border:1px solid var(--line);
-    border-radius:10px;padding:10px;
-  }
-  input[type="number"], input[type="text"]{
-    width:100%;background:var(--surface-2);border:1px solid var(--line);
-    color:var(--text);border-radius:10px;padding:10px 12px;
-    font-family:'JetBrains Mono',monospace;font-size:14px;
-  }
-  input[type="number"]:focus, input[type="text"]:focus{outline:2px solid var(--accent-violet);outline-offset:1px;}
-
-  .audio-preview{width:100%;margin-top:8px;height:34px;}
-  .use-here{
-    margin-top:8px;font-size:12px;color:var(--accent-violet);
-    background:none;border:1px solid var(--accent-violet);
-    padding:6px 10px;border-radius:8px;cursor:pointer;font-family:'JetBrains Mono',monospace;
-  }
-  .use-here:hover{background:rgba(124,92,255,0.12);}
-
+  /* ---- locked audio: cassette / tape-counter styling ---- */
   .locked-audio-box{
-    background:var(--surface-2);border:1px solid var(--line);
-    border-radius:12px;padding:14px;margin-bottom:16px;
+    background:var(--panel-2);border:1px solid var(--line);
+    border-radius:3px;padding:14px 16px;margin-bottom:18px;
+    position:relative;
   }
   .locked-audio-label{
-    font-family:'JetBrains Mono',monospace;font-size:11px;
-    text-transform:uppercase;letter-spacing:.08em;color:var(--accent-violet);margin-bottom:6px;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.1em;color:var(--sage);margin-bottom:7px;
+    display:flex;align-items:center;gap:6px;
   }
-  .locked-audio-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;margin-bottom:4px;}
-  .locked-audio-timing{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
-  .locked-audio-timing b{color:var(--text);}
-
-  .audio-download-btn{
-    display:block;margin-top:10px;text-align:center;
-    background:linear-gradient(135deg,var(--accent-pink),var(--accent-violet));
-    color:#fff;text-decoration:none;font-weight:600;padding:12px;
-    border-radius:10px;font-size:13px;font-family:'Space Grotesk',sans-serif;
+  .locked-audio-label::before{content:"REEL";color:var(--muted);}
+  .locked-audio-name{
+    font-family:'Fraunces',serif;font-weight:600;font-size:16.5px;margin-bottom:8px;color:var(--paper);
   }
+  .waveform{display:block;margin-bottom:10px;}
+  .locked-audio-timing{
+    font-size:11.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;
+    display:flex;align-items:center;gap:8px;
+  }
+  .locked-audio-timing b{color:var(--amber);font-weight:600;}
+  .locked-audio-timing .tick{color:var(--line);}
 
-  .btn-row{display:flex;gap:10px;margin-top:20px;}
+  /* ---- shutter button ---- */
+  .btn-row{display:flex;gap:10px;margin-top:22px;align-items:stretch;}
   button.primary, button.stop{
-    flex:1;border:none;border-radius:12px;padding:14px 16px;
-    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;
-    cursor:pointer;transition:transform .1s ease, opacity .2s ease;
+    flex:1;border:none;border-radius:4px;padding:15px 18px;
+    min-height:54px;
+    font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;
+    cursor:pointer;transition:transform .12s ease, opacity .2s ease, box-shadow .2s ease;
+    display:flex;align-items:center;justify-content:center;gap:10px;
   }
-  button.primary{background:linear-gradient(135deg,var(--accent-pink),var(--accent-violet));color:#fff;}
-  button.stop{background:var(--surface-2);color:var(--text);border:1px solid var(--line);display:none;}
-  button.stop.show{display:block;}
-  button:disabled{opacity:.4;cursor:not-allowed;}
-  button.primary:active, button.stop:active{transform:scale(0.98);}
+  button.primary{
+    background:linear-gradient(120deg,var(--safelight),#c94a24);
+    color:var(--paper);
+    box-shadow:0 10px 26px -10px rgba(226,86,43,0.65), 0 0 0 0 rgba(226,86,43,0.5);
+    animation:shutterPulse 2.6s ease-in-out infinite;
+  }
+  @keyframes shutterPulse{
+    0%,100%{box-shadow:0 10px 26px -10px rgba(226,86,43,0.65), 0 0 0 0 rgba(226,86,43,0.35);}
+    50%{box-shadow:0 10px 26px -10px rgba(226,86,43,0.65), 0 0 0 7px rgba(226,86,43,0);}
+  }
+  button.primary:disabled{animation:none;}
+  @media (hover:hover){
+    button.primary:not(:disabled):hover{filter:brightness(1.08);transform:translateY(-1px);}
+    button.stop:hover{border-color:var(--amber);}
+  }
+  @media (prefers-reduced-motion: reduce){ button.primary{animation:none;} }
+  .shutter-ring{
+    width:16px;height:16px;border-radius:50%;
+    border:2px solid var(--paper);
+    box-shadow:0 0 0 3px rgba(242,232,214,0.25);
+    flex-shrink:0;
+  }
+  button.stop{background:var(--panel-2);color:var(--paper);border:1px solid var(--line);display:none;}
+  button.stop.show{display:flex;}
+  .stop-icon{width:12px;height:12px;background:var(--paper);border-radius:2px;flex-shrink:0;}
+  button:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+  button.primary:active, button.stop:active{transform:scale(0.97);}
 
   .status-line{
-    margin-top:12px;font-size:13px;color:var(--muted);
-    min-height:18px;font-family:'JetBrains Mono',monospace;
+    margin-top:14px;font-size:12.5px;color:var(--muted);
+    min-height:18px;font-family:'IBM Plex Mono',monospace;
   }
 
-  .output{margin-top:16px;}
-  .output video{position:static;transform:none;width:100%;border-radius:12px;display:none;}
+  .output{margin-top:18px;}
+  .output video{position:static;transform:none;width:100%;border-radius:3px;display:none;border:1px solid var(--line);}
   .output a{
     display:none;margin-top:10px;text-align:center;
-    background:var(--success);color:#0B0A10;text-decoration:none;
-    font-weight:600;padding:10px;border-radius:10px;font-size:13px;
-    font-family:'Space Grotesk',sans-serif;
+    background:var(--sage);color:var(--void);text-decoration:none;
+    font-weight:700;padding:12px;border-radius:4px;font-size:13px;
+    font-family:'Instrument Sans',sans-serif;
   }
 
+  /* ---- footer: spec-sheet styling ---- */
   footer{
-    margin-top:28px;font-size:12px;color:var(--muted);
-    line-height:1.7;border-top:1px solid var(--line);padding-top:18px;
+    margin-top:32px;font-size:12px;color:var(--muted);
+    line-height:1.75;border-top:1px solid var(--line);padding-top:20px;
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;
   }
-  footer b{color:var(--text);}
+  footer summary{
+    cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;
+  }
+  footer summary::-webkit-details-marker{display:none;}
+  footer summary::before{
+    content:"▸";color:var(--safelight);font-size:11px;
+    transition:transform .2s ease;
+  }
+  footer details[open] summary::before{transform:rotate(90deg);}
+  footer .footer-body{margin-top:14px;}
+  footer .footer-title{
+    font-family:'Instrument Sans',sans-serif;font-weight:700;color:var(--paper);
+    font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;
+  }
+  footer code{background:var(--panel-2);padding:1px 6px;border-radius:3px;color:var(--amber);}
+
+  /* ---- mobile sticky shutter bar ---- */
+  @media(max-width:600px){
+    .btn-row{
+      position:fixed;left:0;right:0;bottom:0;z-index:50;
+      margin:0;
+      background:rgba(23,18,15,0.88);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      border-top:1px solid var(--line);
+      padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+      box-shadow:0 -10px 26px -10px rgba(0,0,0,0.5);
+    }
+    .card:has(.btn-row){padding-bottom:16px;}
+    .status-line{margin-bottom:calc(66px + env(safe-area-inset-bottom));}
+    .output{margin-bottom:calc(66px + env(safe-area-inset-bottom));}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="eyebrow">Trend Replika — TikTok</div>
-  <h1>Foto Kita <span>Blur</span> Gesture Cam</h1>
+  <div class="masthead">
+    <svg class="mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <circle cx="16" cy="16" r="14" fill="none" stroke="var(--amber)" stroke-width="1.4"/>
+      <circle cx="16" cy="16" r="14" fill="none" stroke="var(--line)" stroke-width="1.4" stroke-dasharray="2 5" opacity="0.7"/>
+      <circle cx="16" cy="16" r="4.5" fill="var(--safelight)"/>
+    </svg>
+    <div class="eyebrow">Trend Replika · TikTok</div>
+  </div>
+  <h1>Foto Kita <em>Blur</em> Gesture Cam</h1>
   <p class="sub">
-    Angkat kedua tangan membentuk isyarat <b>angka 2</b> (jari telunjuk + tengah) di kanan dan kiri sekaligus untuk
-    memicu efek blur kamera secara live — terinspirasi tren yang memakai lagu <b>"Foto Kita Blur"</b> dari Sal Priadi.
-    Atur kapan audio kamu mulai diputar, lalu tekan Record.
+    Angkat kedua tangan membentuk isyarat <b>angka 2</b> (jari telunjuk + tengah) di kanan dan kiri
+    sekaligus untuk memicu efek blur kamera secara live — terinspirasi tren yang memakai lagu
+    <b>"Foto Kita Blur"</b> dari Sal Priadi. Tekan tombol shutter untuk mulai merekam.
   </p>
 
   <div class="grid">
     <div class="card">
-      <h2>📷 Viewfinder</h2>
+      <h2><span class="num">01</span> Viewfinder</h2>
+      <p class="step-caption">Nyalakan kamera, bentuk gestur di kedua tangan.</p>
       <div class="viewfinder" id="viewfinder">
         <video id="video" autoplay muted playsinline></video>
         <canvas id="canvas"></canvas>
+        <div class="vignette"></div>
         <div class="bracket tl"></div>
         <div class="bracket tr"></div>
         <div class="bracket bl"></div>
         <div class="bracket br"></div>
+        <span class="exif-tag tl">f/2.0</span>
+        <span class="exif-tag tr">ISO 400</span>
         <div class="vf-status" id="vfStatus">Menunggu kamera…</div>
         <div class="rec-dot" id="recDot"><i></i>REC <span id="recTime">0:00</span></div>
-        <div class="vf-hint">✌️ Bentuk angka 2 di dua tangan untuk blur</div>
+        <div class="vf-hint">✌️ angka 2 di dua tangan</div>
       </div>
     </div>
 
     <div class="card">
-      <h2>🎵 Audio & Record</h2>
+      <h2><span class="num">02</span> Audio &amp; Shutter</h2>
+      <p class="step-caption">Tekan shutter — audio &amp; rekaman jalan bersamaan.</p>
 
       <div class="locked-audio-box">
-        <div class="locked-audio-label">Audio trek terkunci</div>
+        <div class="locked-audio-label">terkunci</div>
         <div class="locked-audio-name" id="lockedTrackName">Memuat…</div>
-        <div class="locked-audio-timing">Diputar otomatis dari <b id="lockLabelStart">0:00</b> sampai <b id="lockLabelEnd">0:00</b></div>
+        <svg class="waveform" width="100%" height="20" viewBox="0 0 220 20" preserveAspectRatio="none" aria-hidden="true">
+          <g fill="var(--amber)" opacity="0.55">
+            <rect x="0" y="7" width="2.5" height="6"/><rect x="6" y="4" width="2.5" height="12"/><rect x="12" y="8" width="2.5" height="4"/><rect x="18" y="2" width="2.5" height="16"/><rect x="24" y="6" width="2.5" height="8"/><rect x="30" y="9" width="2.5" height="2"/><rect x="36" y="3" width="2.5" height="14"/><rect x="42" y="7" width="2.5" height="6"/><rect x="48" y="1" width="2.5" height="18"/><rect x="54" y="6" width="2.5" height="8"/><rect x="60" y="8" width="2.5" height="4"/><rect x="66" y="4" width="2.5" height="12"/><rect x="72" y="2" width="2.5" height="16"/><rect x="78" y="7" width="2.5" height="6"/><rect x="84" y="5" width="2.5" height="10"/><rect x="90" y="9" width="2.5" height="2"/><rect x="96" y="3" width="2.5" height="14"/><rect x="102" y="6" width="2.5" height="8"/><rect x="108" y="1" width="2.5" height="18"/><rect x="114" y="7" width="2.5" height="6"/><rect x="120" y="4" width="2.5" height="12"/><rect x="126" y="8" width="2.5" height="4"/><rect x="132" y="2" width="2.5" height="16"/><rect x="138" y="6" width="2.5" height="8"/><rect x="144" y="9" width="2.5" height="2"/><rect x="150" y="3" width="2.5" height="14"/><rect x="156" y="7" width="2.5" height="6"/><rect x="162" y="5" width="2.5" height="10"/><rect x="168" y="1" width="2.5" height="18"/><rect x="174" y="6" width="2.5" height="8"/><rect x="180" y="8" width="2.5" height="4"/><rect x="186" y="4" width="2.5" height="12"/><rect x="192" y="2" width="2.5" height="16"/><rect x="198" y="7" width="2.5" height="6"/><rect x="204" y="9" width="2.5" height="2"/><rect x="210" y="3" width="2.5" height="14"/><rect x="216" y="6" width="2.5" height="8"/>
+          </g>
+        </svg>
+        <div class="locked-audio-timing">IN <b id="lockLabelStart">0:00</b><span class="tick">—</span>OUT <b id="lockLabelEnd">0:00</b></div>
       </div>
 
       <div class="btn-row">
-        <button class="primary" id="recordBtn">● Mulai Record</button>
-        <button class="stop" id="stopBtn">■ Stop</button>
+        <button class="primary" id="recordBtn" aria-label="Mulai merekam video dengan audio"><span class="shutter-ring"></span>Rekam</button>
+        <button class="stop" id="stopBtn" aria-label="Hentikan rekaman"><span class="stop-icon"></span>Stop</button>
       </div>
       <div class="status-line" id="statusLine">Izinkan akses kamera & mikrofon untuk mulai.</div>
 
@@ -267,16 +441,20 @@
   </div>
 
   <footer>
-    <b>Catatan penting (untuk kamu, pemilik halaman):</b><br>
-    1. Buat folder bernama <code>audio</code> tepat di sebelah file HTML ini.<br>
-    2. Taruh file audio kamu di dalamnya dengan nama persis <code>track.mp3</code> — pastikan itu audio yang memang legal untuk kamu bagikan (rekaman sendiri, lisensi resmi, atau royalty-free).<br>
-    3. Timing sudah dikunci di kode ke <b>38.5 detik – 53 detik</b> dan tidak muncul sebagai kolom yang bisa diedit di tampilan pengunjung. Kalau mau ubah, cari <code>LOCKED_START</code> / <code>LOCKED_END</code> di bagian &lt;script&gt;.<br>
-    3b. Audio tidak disediakan sebagai file terpisah untuk diunduh — begitu tombol <b>Record</b> ditekan, audio otomatis diputar dari detik 38.5 dan langsung ikut terekam menyatu ke dalam video hasil (bukan file terpisah).<br>
-    4. Struktur folder saat upload ke hosting (GitHub Pages / Netlify / dsb):<br>
-    <code>&nbsp;&nbsp;index.html (file ini)<br>&nbsp;&nbsp;audio/track.mp3</code><br><br>
-    Deteksi tangan berjalan sepenuhnya di browser pengunjung (tidak diunggah ke server manapun). Butuh koneksi internet untuk memuat
-    library deteksi tangan (MediaPipe) saat pertama kali dibuka, dan buka file ini lewat server (bukan langsung dobel-klik)
-    supaya kamera dan file audio lokal bisa diakses dengan benar.
+    <details>
+      <summary class="footer-title">Catatan Teknis — Pemilik Halaman</summary>
+      <div class="footer-body">
+        1. Buat folder <code>audio</code> tepat di sebelah file HTML ini.<br>
+        2. Taruh file audio kamu di dalamnya dengan nama persis <code>track.mp3</code> — pastikan itu audio yang memang legal untuk kamu bagikan (rekaman sendiri, lisensi resmi, atau royalty-free).<br>
+        3. Timing sudah dikunci di kode ke <b style="color:var(--amber)">38.5 detik – 53 detik</b> dan tidak muncul sebagai kolom yang bisa diedit di tampilan pengunjung. Untuk ubah, cari <code>LOCKED_START</code> / <code>LOCKED_END</code> di bagian &lt;script&gt;.<br>
+        4. Audio tidak disediakan sebagai file terpisah untuk diunduh — begitu tombol shutter ditekan, audio otomatis diputar dan langsung ikut terekam menyatu ke dalam video hasil.<br>
+        5. Struktur folder saat upload ke hosting (Vercel / Netlify / GitHub Pages):<br>
+        <code>&nbsp;&nbsp;index.html</code><br><code>&nbsp;&nbsp;audio/track.mp3</code><br><br>
+        Deteksi tangan berjalan sepenuhnya di browser pengunjung (tidak diunggah ke server manapun). Butuh koneksi internet untuk memuat
+        library deteksi tangan (MediaPipe) saat pertama kali dibuka, dan buka file ini lewat server (bukan langsung dobel-klik)
+        supaya kamera dan file audio lokal bisa diakses dengan benar.
+      </div>
+    </details>
   </footer>
 </div>
 
@@ -311,7 +489,7 @@ function fmtTime(s){
 }
 lockLabelStart.textContent = fmtTime(LOCKED_START);
 lockLabelEnd.textContent = fmtTime(LOCKED_END);
-lockedTrackName.textContent = LOCKED_AUDIO_SRC.split('audio/Foto-kita-blur.mp3').pop();
+lockedTrackName.textContent = LOCKED_AUDIO_SRC.split('/').pop();
 
 const audioPreview = new Audio(LOCKED_AUDIO_SRC);
 audioPreview.preload = 'auto';
@@ -454,6 +632,7 @@ canvas.style.transform = 'none';
 recordBtn.addEventListener('click', async ()=>{
   if(!camReady){ statusLine.textContent = 'Kamera belum siap.'; return; }
   recordBtn.disabled = true;
+  if(navigator.vibrate) navigator.vibrate(15);
 
   const canvasStream = canvas.captureStream(30);
   let tracks = [...canvasStream.getVideoTracks()];
@@ -513,7 +692,10 @@ recordBtn.addEventListener('click', async ()=>{
   }
 });
 
-stopBtn.addEventListener('click', stopRecording);
+stopBtn.addEventListener('click', ()=>{
+  if(navigator.vibrate) navigator.vibrate(15);
+  stopRecording();
+});
 
 function stopRecording(){
   if(autoStopTimeout) clearTimeout(autoStopTimeout);
@@ -526,5 +708,7 @@ function stopRecording(){
 // (label timing & nama trek sudah di-set di awal script sebelum kamera dipanggil)
 
 </script>
+</body>
+</html>
 </body>
 </html>
