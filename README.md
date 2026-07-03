@@ -163,12 +163,11 @@ Project ini adalah situs statis murni — bisa langsung di-deploy tanpa proses b
   <a href="https://www.instagram.com/m_hbib03">
     <img src="https://img.shields.io/badge/Instagram-@m__hbib03-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram">
   </a>
-  <a href="https://github.com/USERNAME_GITHUB_KAMU">
+  <a href="https://github.com/mh1803031-ai">
     <img src="https://img.shields.io/badge/GitHub-Follow-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
   </a>
 </p>
 
-> Ganti `USERNAME_GITHUB_KAMU` pada link di atas dengan username GitHub kamu yang sebenarnya.
 
 ---
 
